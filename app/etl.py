@@ -5,11 +5,25 @@ import pandas as pd
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.dialects.postgresql import insert
+from sys import stdout
 
 from models import Base, Books
 
 DB_URI = os.getenv("DB_URI")
 DATA_PATH = "./dataset/"
+
+
+
+def get_module_logger(mod_name: str) -> logging.Logger:
+
+    logger = logging.getLogger(mod_name)
+    handler = logging.StreamHandler()
+    formatter = logging.Formatter(
+        '%(asctime)s [%(name)-12s] %(levelname)-8s %(message)s')
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+    logger.setLevel(logging.DEBUG)
+    return logger
 
 
 def define_args() -> argparse.Namespace:
@@ -25,11 +39,9 @@ def define_args() -> argparse.Namespace:
 
 def extract_and_transform_csv(file_path: str) -> pd.DataFrame:
     # Extract
-    logging.info(f"Extracting data from {file_path}")
     df = pd.read_csv(file_path, on_bad_lines="skip")
 
     # Transform
-    logging.info("Transforming data...")
     df.drop("isbn", inplace=True, axis=1)
     df = df.rename(
         columns={
@@ -71,29 +83,31 @@ def create_session(db_uri: str) -> sessionmaker():
 
 
 def load_data_into_books_table(data: list, session: sessionmaker()) -> None:
-    logging.info("Loading data into the database...")
+
 
     insert_statement = insert(Books).values(data).on_conflict_do_nothing()
     session.execute(insert_statement)
 
-    logging.info("Data loaded successfully, commiting changes...")
 
     session.commit()
 
 
 if __name__ == "__main__":
+    logger = get_module_logger(__name__)
     args = define_args()
     file_path = f"{DATA_PATH}{args.file_name}"
+    logger.info(f"Extracting data from {file_path}")
     data = extract_and_transform_csv(file_path)
     session = create_session(DB_URI)
 
     try:
+        logger.info("Loading data into the database...")
         load_data_into_books_table(data, session)
     except Exception as e:
         session.rollback()
-        logging.error(e)
-        logging.info("Rolling back changes...")
+        logger.error(e)
+        logger.info("Rolling back changes...")
 
     finally:
         session.close()
-        logging.info("Session closed. Exiting...")
+        logger.info("Session closed. Exiting...")
