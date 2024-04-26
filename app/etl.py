@@ -20,7 +20,7 @@ def load_and_format_csv_to_list_of_dict(file_name: str) -> pd.DataFrame:
 def define_args():
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("-f", "--file_path", help="The name of the file to be loaded")
+    parser.add_argument("-f", "--file_path", default="./dataset/books.csv", help="The name of the file to be loaded")
     return parser.parse_args()
 
 if __name__ == "__main__":
