@@ -5,7 +5,6 @@ import pandas as pd
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.dialects.postgresql import insert
-from sys import stdout
 
 from models import Base, Books
 
