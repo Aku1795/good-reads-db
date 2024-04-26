@@ -7,66 +7,76 @@ from sqlalchemy.orm import sessionmaker
 
 from models import Base, Books
 
-
 DB_URI = os.getenv("DB_URI")
-import subprocess
+DATA_PATH = "./dataset/"
 
-subprocess.run(["ls", "-l"])
-
-def load_and_format_csv_to_list_of_dict(file_name: str) -> pd.DataFrame:
-    df = pd.read_csv(file_name, on_bad_lines='skip')
-    df["num_pages"] = df["  num_pages"]
-    df = df.drop(columns=["  num_pages"])
-    return df.to_dict(orient="records")
 
 def define_args():
-
     parser = argparse.ArgumentParser()
-    parser.add_argument("-f", "--file_path", default="./dataset/books.csv", help="The name of the file to be loaded")
+    parser.add_argument("-f", "--file_name", default="books.csv", help="The name of the file to be loaded")
     return parser.parse_args()
+
+
+def extract_and_transform_csv(file_path: str) -> pd.DataFrame:
+    # Extract
+    logging.info(f"Extracting data from {file_path}")
+    df = pd.read_csv(file_path, on_bad_lines='skip')
+
+    # Transform
+    logging.info("Transforming data...")
+    df = df.rename(columns={"  num_pages": "num_pages"})
+
+    return df.to_dict(orient="records")
+
+
+def create_session(db_uri: str) -> sessionmaker:
+    # Create the database
+    engine = create_engine(db_uri)
+    Base.metadata.create_all(engine)
+
+    # Create the session
+    session = sessionmaker()
+    session.configure(bind=engine)
+
+    return session
+
+
+def load_data(data: list, s: sessionmaker()):
+    logging.info("Loading data into the database...")
+    for row in data:
+        record = Books(**{
+            "isbn": row["isbn13"],
+            "title": row["title"],
+            "authors": row["authors"],
+            "average_rating": row["average_rating"],
+            "language_code": row["language_code"],
+            "num_pages": row["num_pages"],
+            "ratings_count": row["ratings_count"],
+            "text_reviews_count": row["text_reviews_count"],
+            "publication_date": row["publication_date"],
+            "publisher": row["publisher"],
+        })
+        s.add(record)
+
+    logging.info("Data loaded successfully, commiting changes...")
+
+    s.commit()
+
 
 if __name__ == "__main__":
     args = define_args()
+    file_path = f"{DATA_PATH}{args.file_name}"
+    data = extract_and_transform_csv(file_path)[:5]
+    s = create_session(DB_URI)
 
-
-    #Create the database
-    engine = create_engine(DB_URI)
-    Base.metadata.create_all(engine)
-
-    #Create the session
-    session = sessionmaker()
-    session.configure(bind=engine)
-    s = session()
     try:
-        data = load_and_format_csv_to_list_of_dict(args.file_path)[:5]
-
-        print(data)
-
-        # for row in data:
-        #     record = Books(**{
-        #         "isbn": row["isbn13"],
-        #         "title": row["title"],
-        #         "authors": row["authors"],
-        #         "average_rating": row["average_rating"],
-        #         "language_code": row["language_code"],
-        #         "num_pages": row["num_pages"],
-        #         "ratings_count": row["ratings_count"],
-        #         "text_reviews_count": row["text_reviews_count"],
-        #         "publication_date": row["publication_date"],
-        #         "publisher": row["publisher"],
-        #     })
-        #     s.add(record)
-
-
-        logging.info("Data loaded successfully, commiting changes...")
-
-        s.commit()
+        load_data(data, s)
     except Exception as e:
         s.rollback()
 
-        logging.error("An error occurred, rolling back changes...")
-
         logging.error(e.message)
+        logging.info("Rolling back changes...")
+
     finally:
         s.close()
 
