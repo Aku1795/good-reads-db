@@ -12,13 +12,13 @@ DB_URI = os.getenv("DB_URI")
 DATA_PATH = "./dataset/"
 
 
-
 def get_module_logger(mod_name: str) -> logging.Logger:
 
     logger = logging.getLogger(mod_name)
     handler = logging.StreamHandler()
     formatter = logging.Formatter(
-        '%(asctime)s [%(name)-12s] %(levelname)-8s %(message)s')
+        "%(asctime)s [%(name)-12s] %(levelname)-8s %(message)s"
+    )
     handler.setFormatter(formatter)
     logger.addHandler(handler)
     logger.setLevel(logging.DEBUG)
@@ -83,11 +83,8 @@ def create_session(db_uri: str) -> sessionmaker():
 
 def load_data_into_books_table(data: list, session: sessionmaker()) -> None:
 
-
     insert_statement = insert(Books).values(data).on_conflict_do_nothing()
     session.execute(insert_statement)
-
-
     session.commit()
 
 
