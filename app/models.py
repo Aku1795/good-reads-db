@@ -8,7 +8,7 @@ class Books(Base):
     __tablename__ = "books"
 
     isbn = Column(BigInteger, primary_key=True)
-    title = Column(String, unique=True)
+    title = Column(String)
     authors = Column(String)
     average_rating = Column(Double)
     language_code = Column(String)
