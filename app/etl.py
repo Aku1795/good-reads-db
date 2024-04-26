@@ -11,7 +11,7 @@ DB_URI = os.getenv("DB_URI")
 DATA_PATH = "./dataset/"
 
 
-def define_args():
+def define_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("-f", "--file_name", default="books.csv", help="The name of the file to be loaded")
     return parser.parse_args()
@@ -29,19 +29,17 @@ def extract_and_transform_csv(file_path: str) -> pd.DataFrame:
     return df.to_dict(orient="records")
 
 
-def create_session(db_uri: str) -> sessionmaker:
-    # Create the database
+def create_session(db_uri: str) -> sessionmaker():
+
     engine = create_engine(db_uri)
     Base.metadata.create_all(engine)
-
-    # Create the session
     session = sessionmaker()
     session.configure(bind=engine)
 
-    return session
+    return session()
 
 
-def load_data(data: list, s: sessionmaker()):
+def load_data_into_books_table(data: list, session: sessionmaker()) -> None:
     logging.info("Loading data into the database...")
     for row in data:
         record = Books(**{
@@ -56,28 +54,28 @@ def load_data(data: list, s: sessionmaker()):
             "publication_date": row["publication_date"],
             "publisher": row["publisher"],
         })
-        s.add(record)
+        session.add(record)
 
     logging.info("Data loaded successfully, commiting changes...")
 
-    s.commit()
+    session.commit()
 
 
 if __name__ == "__main__":
     args = define_args()
     file_path = f"{DATA_PATH}{args.file_name}"
-    data = extract_and_transform_csv(file_path)[:5]
-    s = create_session(DB_URI)
+    data = extract_and_transform_csv(file_path)[5:11]
+    session = create_session(DB_URI)
 
     try:
-        load_data(data, s)
+        load_data_into_books_table(data, session)
     except Exception as e:
-        s.rollback()
+        session.rollback()
 
-        logging.error(e.message)
+        logging.error(e)
         logging.info("Rolling back changes...")
 
     finally:
-        s.close()
+        session.close()
 
         logging.info("Session closed. Exiting...")
