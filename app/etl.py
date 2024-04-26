@@ -9,7 +9,9 @@ from models import Base, Books
 
 
 DB_URI = os.getenv("DB_URI")
+import subprocess
 
+subprocess.run(["ls", "-l"])
 
 def load_and_format_csv_to_list_of_dict(file_name: str) -> pd.DataFrame:
     df = pd.read_csv(file_name, on_bad_lines='skip')
@@ -40,20 +42,20 @@ if __name__ == "__main__":
 
         print(data)
 
-        for row in data:
-            record = Books(**{
-                "isbn": row["isbn13"],
-                "title": row["title"],
-                "authors": row["authors"],
-                "average_rating": row["average_rating"],
-                "language_code": row["language_code"],
-                "num_pages": row["num_pages"],
-                "ratings_count": row["ratings_count"],
-                "text_reviews_count": row["text_reviews_count"],
-                "publication_date": row["publication_date"],
-                "publisher": row["publisher"],
-            })
-            s.add(record)
+        # for row in data:
+        #     record = Books(**{
+        #         "isbn": row["isbn13"],
+        #         "title": row["title"],
+        #         "authors": row["authors"],
+        #         "average_rating": row["average_rating"],
+        #         "language_code": row["language_code"],
+        #         "num_pages": row["num_pages"],
+        #         "ratings_count": row["ratings_count"],
+        #         "text_reviews_count": row["text_reviews_count"],
+        #         "publication_date": row["publication_date"],
+        #         "publisher": row["publisher"],
+        #     })
+        #     s.add(record)
 
 
         logging.info("Data loaded successfully, commiting changes...")

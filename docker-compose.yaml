@@ -3,10 +3,10 @@ services:
     etl:
       build: .
       restart: always
+      environment:
+        DB_URI: ${DB_URI}
       volumes:
-        - ./application:/usr/src/app/
+        - ./dataset:/usr/app/src/dataset
       ports:
         - '5000:5000'
-      depends_on:
-        - "postgres"
 

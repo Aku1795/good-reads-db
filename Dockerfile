@@ -1,14 +1,14 @@
 FROM python:3.9
 WORKDIR /usr/app/src
 
-RUN pip install --upgrade pip
-COPY ./requirements.txt /usr/src/app/requirements.txt
-RUN pip install -r requirements.txt
+RUN pip3 install --upgrade pip
+COPY ./requirements.txt /usr/app/src/requirements.txt
+RUN pip3 install -r requirements.txt
 
-COPY ./app/etl.py /usr/src/app/etl.py
-COPY ./app/models.py /usr/src/app/models.py
+COPY ./app/etl.py /usr/app/src/etl.py
+COPY ./app/models.py /usr/app/src/models.py
+
 ENTRYPOINT ["python3"]
 CMD ["etl.py"]
 
-ENTRYPOINT [ "python3", "app.py" ]
-CMD ["-c", "FR"]
+
