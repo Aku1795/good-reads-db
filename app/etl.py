@@ -81,9 +81,9 @@ def create_session(db_uri: str) -> sessionmaker():
     return Session()
 
 
-def load_data_into_books_table(data: list, session: sessionmaker()) -> None:
+def load_data_into_books_table(data: list[dict], books_table, session: sessionmaker()) -> None:
 
-    insert_statement = insert(Books).values(data).on_conflict_do_nothing()
+    insert_statement = insert(books_table).values(data).on_conflict_do_nothing()
     session.execute(insert_statement)
     session.commit()
 
@@ -98,7 +98,7 @@ if __name__ == "__main__":
 
     try:
         logger.info("Loading data into the database...")
-        load_data_into_books_table(data, session)
+        load_data_into_books_table(data, Books, session)
     except Exception as e:
         session.rollback()
         logger.error(e)
