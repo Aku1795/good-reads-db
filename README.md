@@ -5,17 +5,18 @@ The dataset is available on Kaggle and can be found [here](https://www.kaggle.co
 
 ## Postgres Database
 
-The database consists of one table called `books`. Its schema can be found in the `model.py` file. It is currently hosted
-on Aiven.
+The database is a Postgres one hosted on Aiven. It consists of one table called `books`. 
+Its schema can be found in the `model.py` file. 
 
 ## Database migration
 
 In case of schema changes, database migration can be performed using alembic. To do so:
 
-- cd into the app directory
 - modify the schema in the `model.py` file
 - if needed modify the etl process to reflect the schema changes
+- cd into the app directory
 - run `alembic revision -m "migration message"`
+- modify the migration file created in the `alembic/versions` directory
 - run `alembic upgrade head`
 
 Please note that this process is done locally. You need therefore to have alembic and sqlalchemy installed on your local
