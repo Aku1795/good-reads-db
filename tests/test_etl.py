@@ -1,8 +1,13 @@
 from pandas import Timestamp
 
-import app.etl as etl
+import etl as etl
+from models.models import Books
 
 FILE_PATH = './tests/mock_data/books.csv'
+
+def test_get_module_logger():
+    logger = etl.get_module_logger('test')
+    assert logger.name == 'test_'
 
 def test_extract_and_transform_csv():
     data = etl.extract_and_transform_csv(FILE_PATH)
@@ -19,3 +24,13 @@ def test_extract_and_transform_csv():
         'publication_date': Timestamp('2006-09-16 00:00:00'),
         'publisher': 'Scholastic Inc.'
     }
+
+def test_create_session():
+    session = etl.create_session('sqlite:///:memory:')
+    assert session.bind.url.database == ':memory:'
+
+def test_load_data_into_books_table():
+    data = etl.extract_and_transform_csv(FILE_PATH)
+    session = etl.create_session('sqlite:///:memory:')
+    etl.load_data_into_books_table(data, Books, session)
+    assert session.query(Books).count() == 4

@@ -1,16 +1,11 @@
 import argparse
-import os
 import logging
 import pandas as pd
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.dialects.postgresql import insert
 
-from app.models.models import Base, Books
-
-DB_URI = os.getenv("DB_URI")
-DATA_PATH = "./dataset/"
-
+from models.models import Base
 
 def get_module_logger(mod_name: str) -> logging.Logger:
 
@@ -88,22 +83,4 @@ def load_data_into_books_table(data: list[dict], books_table, session: sessionma
     session.commit()
 
 
-if __name__ == "__main__":
-    logger = get_module_logger(__name__)
-    args = define_args()
-    file_path = f"{DATA_PATH}{args.file_name}"
-    logger.info(f"Extracting data from {file_path}")
-    data = extract_and_transform_csv(file_path)
-    session = create_session(DB_URI)
 
-    try:
-        logger.info("Loading data into the database...")
-        load_data_into_books_table(data, Books, session)
-    except Exception as e:
-        session.rollback()
-        logger.error(e)
-        logger.info("Rolling back changes...")
-
-    finally:
-        session.close()
-        logger.info("Session closed. Exiting...")
