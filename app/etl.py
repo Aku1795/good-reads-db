@@ -36,7 +36,7 @@ def define_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def extract_and_transform_csv(file_path: str) -> pd.DataFrame:
+def extract_and_transform_csv(file_path: str) -> list[dict]:
     # Extract
     df = pd.read_csv(file_path, on_bad_lines="skip")
 
