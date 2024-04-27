@@ -7,7 +7,7 @@ FILE_PATH = './tests/mock_data/books.csv'
 
 def test_get_module_logger():
     logger = etl.get_module_logger('test')
-    assert logger.name == 'test_'
+    assert logger.name == 'test'
 
 def test_extract_and_transform_csv():
     data = etl.extract_and_transform_csv(FILE_PATH)
