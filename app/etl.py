@@ -6,7 +6,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.dialects.postgresql import insert
 
-from models import Base, Books
+from app.models.models import Base, Books
 
 DB_URI = os.getenv("DB_URI")
 DATA_PATH = "./dataset/"
