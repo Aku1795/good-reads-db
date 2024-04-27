@@ -46,3 +46,11 @@ This will start the ETL process and insert the data into the database.
 
 Once the process is done, you can run `docker compose down` to stop the process.
 
+## Running the tests
+
+To run the tests, you need to have all the requirements in the `requirements.txt` file installed.
+
+Once you have the requirements installed, you can run the following command to run the tests:
+`pytest tests/`. This will run the tests defined in the `tests` directory.
+
+Those tests are also executed within the container before the ETL process starts.
