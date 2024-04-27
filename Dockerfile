@@ -6,7 +6,7 @@ COPY ./requirements.txt /usr/app/src/requirements.txt
 RUN pip3 install -r requirements.txt
 
 COPY ./app/etl.py /usr/app/src/etl.py
-COPY ./app/models.py /usr/app/src/models.py
+COPY ./app/models/models.py /usr/app/src/models.py
 
 ENTRYPOINT ["python3", "-u"]
 CMD ["etl.py"]
