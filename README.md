@@ -19,7 +19,8 @@ In case of schema changes, database migration can be performed using alembic. To
 - run `alembic upgrade head`
 
 Please note that this process is done locally. You need therefore to have alembic and sqlalchemy installed on your local
-machine. 
+machine. Also please make sure to have the database connection string in the `.env` file in the root directory of the project
+and export the variables present in it to your terminal session.
 
 ## ETL
 
