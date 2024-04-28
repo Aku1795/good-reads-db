@@ -6,7 +6,7 @@ The dataset is available on Kaggle and can be found [here](https://www.kaggle.co
 ## Postgres Database
 
 The database is a Postgres one hosted on Aiven. It consists of one table called `books`. 
-Its schema can be found in the `./app/models/model.py` file. 
+Its schema can be found in the `./app/models/models.py` file. 
 
 ## Database migration
 
